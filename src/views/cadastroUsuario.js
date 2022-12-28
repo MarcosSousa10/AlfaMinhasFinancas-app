@@ -2,13 +2,57 @@ import React from "react";
 import Card from "../components/card";
 import FormGroup from "../components/form-group";
 import { Link } from "react-router-dom";
+import UsuarioSerivice from "../app/service/usuarioService";
+import { mensagemSucesso,mensagemErro } from "../components/toastr";
 class CadastroUsuario extends React.Component{
     state={
         nome:"",email:"",senha:"",senhaRepeticao:""
     }
     cadastrar=()=>{
-        console.log(this.state)
+        const msgs = this.validar();
+        if(msgs && msgs.length>0){
+            msgs.forEach((msg, index)=>{
+                mensagemErro(msg)
+            });
+            return false;
+        }
+        const usuario = {
+            nome: this.state.nome,
+            email: this.state.email,
+            senha: this.state.senha
+        }
+       this.service.salvar(usuario)
+       .then(response =>{
+        mensagemSucesso('Usuario cadastrado com sucesso! Faça o login para acessar o  sistema');
+     //pode dar erro
+        this.props.history.push('/login')
+    }).catch(erro =>{
+        mensagemErro(erro.response.data)
+    })
     }
+    constructor(){
+        super();
+        this.service = new UsuarioSerivice();
+    }
+    validar(){
+        const msgs=[]
+        if(!this.state.nome){
+            msgs.push('o campo Nome e obrigatorio.')
+        }
+        if(!this.state.email){
+            msgs.push('O campo Email é obrigatorio.')
+        }else if(!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)){
+            msgs.push('O campo Email valido.')
+        }
+         if(!this.state.senha||!this.state.senhaRepeticao){
+            msgs.push('o campo Senha e ou senha oubrigatorios.')
+        }else if(this.state.senha !== this.state.senhaRepeticao){
+            msgs.push('As senhas não batem.')
+        }
+
+        return msgs;
+    }
+  
 render(){
     return(
         <div className="container">

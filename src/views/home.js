@@ -1,7 +1,22 @@
 import React from "react";
+import UsuarioSerivice from "../app/service/usuarioService";
+import LocalStorageService from "../app/service/localStorageService";
 class Home extends React.Component{
     state={
         saldo:0
+    }
+    constructor(){
+        super();
+        this.service = new UsuarioSerivice();
+    }
+    componentDidMount(){
+       const usuarioLogado = LocalStorageService.obterItem('_usuario_logado')
+        this.UsuarioSerivice.obterSaldoPorUsuario(usuarioLogado.id)
+        .then(response =>{
+            this.setState({saldo: response.data})
+        }).catch(error => {
+            console.error(error.response)
+        });
     }
 render(){
     return(
@@ -13,7 +28,7 @@ render(){
                 <hr className="my-4"/>
                 <p className="lead">
                     <a className="btn btn-primary btn-lg" href="/cadastro-usuarios" role='button'><i className="fa fa-users">Cadastrar Usuario</i></a>
-                    <a className="btn btn-danger btn-lg" href="" role='button'><i className="fa fa-users">Cadastrar Lancamento</i></a>
+                    <a className="btn btn-danger btn-lg" href="/cadastro-lancamentos" role='button'><i className="fa fa-users">Cadastrar Lancamento</i></a>
                 </p>
             </div>
         </div>
